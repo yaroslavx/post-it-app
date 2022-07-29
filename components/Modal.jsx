@@ -26,11 +26,10 @@ import Moment from "react-moment";
 function Modal() {
   const [isOpen, setIsOpen] = useRecoilState(modalState);
   const [postId, setPostId] = useRecoilState(postIdState);
-  const [post, setPost] = useState(); 
-  const [comment, setComment] = useState('');
+  const [post, setPost] = useState();
+  const [comment, setComment] = useState("");
   const { data: session } = useSession();
-
-  const router = useRouter()
+  const router = useRouter();
 
   const sendComment = async (e) => {
     e.preventDefault();
@@ -40,13 +39,13 @@ function Modal() {
       username: session.user.name,
       tag: session.user.tag,
       userImg: session.user.image,
-      timestamp: serverTimestamp()
+      timestamp: serverTimestamp(),
     });
 
-    setIsOpen(false)
-    setComment("")
+    setIsOpen(false);
+    setComment("");
 
-    router.push(`/${postId}`)
+    router.push(`/${postId}`);
   };
 
   useEffect(
@@ -93,32 +92,34 @@ function Modal() {
               </div>
               <div className="flex px-4 pt-2.5 pb-2.5 ">
                 <div className="w-full">
-                  <div className="text-[#6e767d] flex gap-x-3 relative">
-                    <span className="w-0.5 h-full z-[-1] absolute left-5 top-11 bg-gray-400" />
+                  <div className="text-[#6e767d] flex gap-x-3 relative items-center">
+                    <span className="w-0.5 h-full z-[-1] absolute left-[21px] top-11 bg-gray-400" />
                     <img
-                      src={post?.userImg}
+                      src={post?.userImg || session.user.image}
                       alt=""
                       className="h-11 w-11 rounded-full"
                     />
                     <div className="text-[#6e767d]">
                       <div className="inline-block group">
                         <h4
-                          className={`font-bold text-[15px] sm-text-base text-black  group-hover:underline inline-block`}
+                          className={`font-bold text-[15px] text-neutral-800 group-hover:underline inline-block`}
                         >
-                          {post?.username}
+                          {post?.username || session.user.name}
                         </h4>
                         <span className={`text-[15px] ml-1.5`}>
-                          @{post?.tag}
+                          @{post?.tag || session.user.tag}
                         </span>
                       </div>
                       <span className="text-[15px] ml-1.5">
-                        <Moment fromNow>{post?.timestamp?.toDate()}</Moment>
+                        {post ? (
+                          <Moment fromNow>{post?.timestamp?.toDate()}</Moment>
+                        ) : null}
                       </span>
-                      {
-                        <p className="text-[15px] mt-0.5 text-black">
+                      {post ? (
+                        <p className="text-[15px] mt-0.5 text-neutral-800">
                           {post?.text}
                         </p>
-                      }
+                      ) : null}
                     </div>
                   </div>
                   <div className="mt-7 flex space-x-3 w-full">
@@ -147,7 +148,7 @@ function Modal() {
                           <CalendarIcon className="icon" />
                         </div>
                         <button
-                          className="bg-theme px-5 py-2 font-bold text-white rounded-full transition-all disabled:opacity-50"
+                          className="bg-theme px-5 py-2 font-bold text-white rounded-full transition-all duration-200 disabled:opacity-70 hover:bg-theme/70"
                           type="submit"
                           onClick={sendComment}
                           disabled={!comment.trim()}

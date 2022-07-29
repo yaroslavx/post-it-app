@@ -28,7 +28,7 @@ import {
 } from "@firebase/firestore";
 import { db } from "../firebase";
 
-const Post = ({ id, post, postPage }) => {
+const Post = ({ id, post, postPage, comm }) => {
   const { data: session } = useSession();
   const [isOpen, setIsOpen] = useRecoilState(modalState);
   const [comments, setComments] = useState([]);
@@ -42,14 +42,16 @@ const Post = ({ id, post, postPage }) => {
       onSnapshot(collection(db, "posts", id, "likes"), (snapshot) =>
         setLikes(snapshot.docs)
       ),
-    [db, id]
+    [db]
   );
 
-
-    useEffect(
+  useEffect(
     () =>
       onSnapshot(
-        query(collection(db, "posts", id, "comments"), orderBy("timestamp", "desc")),
+        query(
+          collection(db, "posts", id, "comments"),
+          orderBy("timestamp", "desc")
+        ),
         (snapshot) => {
           setComments(snapshot.docs);
         }
@@ -58,9 +60,11 @@ const Post = ({ id, post, postPage }) => {
   );
 
   useEffect(
-    () => 
-    setLiked(likes.findIndex((like) => like.id === session?.user?.uid) !== -1),
-      [likes]
+    () =>
+      setLiked(
+        likes.findIndex((like) => like.id === session?.user?.uid) !== -1
+      ),
+    [likes]
   );
 
   const likePost = async () => {
@@ -72,12 +76,13 @@ const Post = ({ id, post, postPage }) => {
       });
     }
   };
+  console.log(comments)
 
   return (
     <div
-      className="p-3 flex cursor-pointer border-b"
+      className="p-3 flex cursor-pointer border-b hover:bg-gray-100 transition-all duration-200"
       onClick={() => router.push(`/${id}`)}
-    >
+      >
       {!postPage && (
         <img
           src={post?.userImg}
@@ -85,21 +90,21 @@ const Post = ({ id, post, postPage }) => {
           className="h-14 w-14 rounded-full object-cover mr-2.5"
         />
       )}
-      <div className="flex flex-col space-y-2 w-full justify-center">
-        <div className={`flex ${!postPage && "justify-between"}`}>
+      <div className={`flex flex-col space-y-2 w-full justify-center ${comm && "space-y-0"}`}>
+        <div className={`flex items-center ${!postPage && "justify-between"}`}>
           {postPage && (
             <img
               src={post?.userImg}
-              alt="profilepic "
-              className="h-14 w-14 rounded-full object-cover"
+              alt="profilepic"
+              className="h-14 w-14 rounded-full object-cover mr-2.5"
             />
           )}
           <div className="text-[#6e767d]">
             <div className="inline-block group">
               <h4
-                className={`font-bold text-[15px] sm-text-base text-black  group-hover:underline ${
+                className={`font-bold text-[15px] text-neutral-800 group-hover:underline ${
                   !postPage && "inline-block"
-                }`}
+                } ${comm && "mt-1.5"}`}
               >
                 {post?.username}
               </h4>
@@ -110,28 +115,31 @@ const Post = ({ id, post, postPage }) => {
             <span className="text-[15px] ml-1.5">
               <Moment fromNow>{post?.timestamp?.toDate()}</Moment>
             </span>
-            {!postPage && (
-              <p className="text-[15px] mt-0.5 text-black ">{post?.text}</p>
+            {!postPage && !comm && (
+              <p className="text-[15px] mt-0.5 text-neutral-800">
+                {post?.text}
+              </p>
             )}
           </div>
-          <div className=" mt-1.5 icon group flex-shrink-0 ml-auto">
-            <DotsHorizontalIcon className="h-5 text-[#6e767d] group-hover:text-[#1d9bf0]" />
+          <div className="mt-1.5 icon group flex-shrink-0 ml-auto">
+            <DotsHorizontalIcon className="h-5 text-[#6e767d] group-hover:text-theme" />
           </div>
         </div>
         {postPage && (
-          <p className="text-[15px] mt-0.5 text-black">{post?.text}</p>
+          <p className="text-[15px] mt-0.5 text-neutral-800 mx-1">{post?.text}</p>
+        )}
+        {comm && (
+          <p className="text-[15px] text-neutral-800">{post?.comment}</p>
         )}
 
         <img
           src={post?.image}
           alt=""
-          className="rounded-2xl max-h-[700px] object-cover mr-2"
+          className={`${postPage && "mx-1"} rounded-2xl max-h-[700px] object-cover`}
         />
         <div
-          className={`text-[#6e767d] flex justify-between w-10/12 ${
-            postPage && "mx-auto"
-          }`}
-        >
+          className={`${comm && "pt-5"} text-[#6e767d] flex justify-between mx-auto w-10/12 pt-1`}
+          >
           <div
             className="flex items-center space-x-1 group"
             onClick={(e) => {
@@ -139,12 +147,12 @@ const Post = ({ id, post, postPage }) => {
               setPostId(id);
               setIsOpen(true);
             }}
-          >
-            <div className="icon group-hover:bg-[#1d9bf0] group-hover:bg-opacity-10">
-              <ChatIcon className="h-5 group-hover:text-[#1d9bf0]" />
+            >
+            <div>
+              <ChatIcon className="icon h-5 group-hover:text-theme" />
             </div>
             {comments.length > 0 && (
-              <span className="group-hover:text-[#1d9bf0] text-sm">
+              <span className="group-hover:text-theme text-sm">
                 {comments.length}
               </span>
             )}
@@ -159,13 +167,13 @@ const Post = ({ id, post, postPage }) => {
                 router.push("/");
               }}
             >
-              <div className="icon group-hover:bg-red-600/10">
+              <div className="icon">
                 <TrashIcon className="h-5 group-hover:text-red-600" />
               </div>
             </div>
           ) : (
             <div className="flex items-center space-x-1 group">
-              <div className="icon group-hover:bg-green-500/10">
+              <div className="icon">
                 <SwitchHorizontalIcon className="h-5 group-hover:text-green-500" />
               </div>
             </div>
@@ -178,7 +186,7 @@ const Post = ({ id, post, postPage }) => {
               likePost();
             }}
           >
-            <div className="icon group-hover:bg-pink-600/10">
+            <div className="icon">
               {liked ? (
                 <HeartIconFilled className="h-5 text-pink-600" />
               ) : (
@@ -197,15 +205,15 @@ const Post = ({ id, post, postPage }) => {
           </div>
 
           <div className="icon group">
-            <ShareIcon className="h-5 group-hover:text-[#1d9bf0]" />
+            <ShareIcon className="h-5 group-hover:text-theme" />
           </div>
           <div className="icon group">
-            <ChartBarIcon className="h-5 group-hover:text-[#1d9bf0]" />
+            <ChartBarIcon className="h-5 group-hover:text-theme" />
           </div>
         </div>
       </div>
     </div>
   );
-}
+};
 
 export default Post;

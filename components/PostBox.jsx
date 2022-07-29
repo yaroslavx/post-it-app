@@ -68,7 +68,7 @@ function PostBox() {
 
   return (
     <div
-      className={` p-3 flex space-x-3 border-b overflow-y-scroll scrollbar-hide ${
+      className={`p-3 flex space-x-3 border-b overflow-y-scroll scrollbar-hide ${
         loading && "opacity-60"
       }`}
     >
@@ -84,7 +84,7 @@ function PostBox() {
             onChange={(e) => setInput(e.target.value)}
             type="text"
             placeholder="What's happening?"
-            className="h-24 w-full outline-none text-xl placeholder:text-xl"
+            className="h-24 w-full text-neutral-800 outline-none text-xl placeholder:text-xl"
           />
 
           {selectedFile && (
@@ -105,7 +105,7 @@ function PostBox() {
 
           {!loading && (
             <div className="flex items-center">
-              <div className="flex flex-1 space-x-1 text-theme ">
+              <div className="flex flex-1 space-x-1 pl-1 text-theme">
                 <div
                   className="icon"
                   onClick={() => filePickerRef.current.click()}
@@ -126,7 +126,7 @@ function PostBox() {
               <button
                 onClick={sendPost}
                 disabled={!input.trim() && !selectedFile}
-                className="bg-theme px-5 py-2 font-bold text-white rounded-full transition-all disabled:opacity-50"
+                className="bg-theme px-5 py-2 font-bold text-white rounded-full hover:bg-theme/70 transition-all duration-200 disabled:opacity-70"
               >
                 Post
               </button>

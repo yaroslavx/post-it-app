@@ -17,7 +17,7 @@ import {
 } from "firebase/firestore";
 import { useState } from "react";
 import { db } from "../firebase";
-import { ArrowLeftIcon } from "@heroicons/react/outline";
+import { ArrowLeftIcon, ArrowNarrowLeftIcon } from "@heroicons/react/outline";
 import { comment } from "postcss";
 import Comment from "../components/Comment";
 
@@ -34,6 +34,7 @@ function PostPage({ providers }) {
       onSnapshot(doc(db, "posts", id), (snapshot) => setPost(snapshot.data())),
     [db]
   );
+
 
   useEffect(
     () =>
@@ -59,28 +60,40 @@ function PostPage({ providers }) {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <main className="grid grid-cols-9">
+      <main className="grid grid-cols-9 min-h-screen">
         <Sidebar />
-        <div className="col-span-8 md:col-span-7 lg:col-span-5 border-x h-screen">
-          <div className="flex items-center px-1.5 py-2 border-b text-black font-bold text-xl gap-x-4  top-0 z-50 bg-white">
+        <div className="col-span-9 md:col-span-7 lg:col-span-5 border-x">
+          <div className="py-3 border-b">
             <div
-              className="icon w-9 h-9 flex items-center justify-center xl:px-0"
               onClick={() => router.push("/")}
+              className="flex items-center my-2.5 mx-2 text-neutral-800 rounded-full max-w-fit text-xl gap-x-0 top-0 z-50  pr-5 pl-3 group hover:bg-gray-100 group cursor-pointer transition-all duration-200"
             >
-              <ArrowLeftIcon className="icon h-5 text-theme" />
+              <div className=" w-9 h-11 flex items-center justify-center">
+                <ArrowNarrowLeftIcon className="group-hover:text-theme h-7 text-neutral-800 transition-all duration-200" />
+              </div>
+              <h1 className="group-hover:text-theme text-neutral-800 py-2 px-0 text-xl font-medium transition-all duration-200">
+                Post
+              </h1>
             </div>
-            Post
           </div>
+          <div className="max-h-screen overflow-scroll pb-72 scrollbar-hide">
           <Post id={id} post={post} postPage />
           {comments.length > 0 && (
             <div>
               {comments.map((comment) => (
-                <Comment key={comment.id} id={comment.id } comment={comment.data()} />
+                <Post key={comment.id} id={comment.id} post={comment.data()} comm/>
+                // <Comment
+                //   key={comment.id}
+                //   id={comment.id}
+                //   comment={comment.data()}
+                // />
               ))}
             </div>
           )}
+          </div>
+          
         </div>
-        {isOpen && <Modal />}
+        {isOpen && <Modal comments={comments}/>}
       </main>
     </div>
   );

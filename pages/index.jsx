@@ -8,8 +8,9 @@ import Login from "../components/Login";
 import Modal from "../components/Modal";
 import { useRecoilState } from 'recoil'
 import { modalState } from '../atoms/modalAtom'
+import { Toaster } from 'react-hot-toast'
 
-const Home = ({trendingResults, followResults, providers}) => {
+const Home= ( {providers} ) => {
   const [isOpen, setIsOpen] = useRecoilState(modalState);
 
   const { data: session } = useSession()
@@ -20,12 +21,12 @@ const Home = ({trendingResults, followResults, providers}) => {
         <title>Post it</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
-
+      <Toaster/>
       <main className='grid grid-cols-9'>
         <Sidebar/>
-
         <Feed/>
         {isOpen && (<Modal/>)}
+        
         
         <Widgets/>
       </main>
@@ -36,20 +37,12 @@ const Home = ({trendingResults, followResults, providers}) => {
 export default Home
 
 
-export async function getServerSideProps(context) {
-  const trendingResults = await fetch("https://jsonkeeper.com/b/NKEV").then(
-    (res) => res.json()
-  );
-  const followResults = await fetch("https://jsonkeeper.com/b/WWMJ").then(
-    (res) => res.json()
-  );
+export  const getServerSideProps = async (context) => {
   const providers = await getProviders();
   const session = await getSession(context);
 
   return {
     props: {
-      trendingResults,
-      followResults,
       providers,
       session,
     },
